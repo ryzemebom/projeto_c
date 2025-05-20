@@ -1,140 +1,229 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-void salvarDominioEmArquivo(const char *dominio, const char *nome) {
-    FILE *arquivo = fopen("dominios.txt", "a");  // Abre o arquivo no modo "append" (acrescentar)
+void limparTela() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+typedef struct Nodo {
+    char dominio[100];
+    char responsavel[100];
+    struct Nodo *next;
+} Nodo;
+
+Nodo *dominios = NULL;
+
+void registrarDominio(Nodo **lista, const char *dominio, const char *responsavel) {
+    Nodo *novoNodo = (Nodo *)malloc(sizeof(Nodo));
+    if (novoNodo == NULL) {
+        printf("\nErro ao alocar memÃ³ria para o novo domÃ­nio.\n");
+        return;
+    }
+    strcpy(novoNodo->dominio, dominio);
+    strcpy(novoNodo->responsavel, responsavel);
+    novoNodo->next = *lista;
+    *lista = novoNodo;
+}
+
+int dominioJaExiste(Nodo *lista, const char *dominio) {
+    Nodo *temp = lista;
+    while (temp != NULL) {
+        if (strcmp(temp->dominio, dominio) == 0) {
+            return 1;
+        }
+        temp = temp->next;
+    }
+    return 0;
+
+void exibirTodosDominios(Nodo *lista) {
+    Nodo *temp = lista;
+    if (temp == NULL) {
+        printf("\nNenhum domÃ­nio registrado.\n");
+        return;
+    }
+
+    printf("\nDomÃ­nios registrados:\n");
+    printf("-------------------------------\n");
+    while (temp != NULL) {
+        printf("Dominio: %s\nResponsÃ¡vel: %s\n", temp->dominio, temp->responsavel);
+        printf("-------------------------------\n");
+        temp = temp->next;
+    }
+}
+
+void liberarLista(Nodo *lista) {
+    Nodo *temp;
+    while (lista != NULL) {
+        temp = lista;
+        lista = lista->next;
+        free(temp);
+    }
+}
+
+void carregarDominiosDoArquivo(Nodo **lista) {
+    FILE *arquivo = fopen("dominios.txt", "r");
+    if (arquivo == NULL) {
+        printf("Nenhum arquivo encontrado para carregar os domÃ­nios.\n");
+        return;
+    }
+
+    char linha[256];
+    char dominio[100], responsavel[100];
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        if (strstr(linha, "Dominio: ") == linha) {
+            sscanf(linha, "Dominio: %99[^\n]", dominio);
+            if (fgets(linha, sizeof(linha), arquivo)) {
+                sscanf(linha, "Responsavel: %99[^\n]", responsavel);
+                registrarDominio(lista, dominio, responsavel);
+            }
+        }
+    }
+
+    fclose(arquivo);
+}
+
+void salvarDominioNoArquivo(const char *dominio, const char *nome) {
+    FILE *arquivo = fopen("dominios.txt", "a");
     if (arquivo == NULL) {
         printf("\nErro ao abrir o arquivo para salvar o dominio.\n");
         return;
     }
-    fprintf(arquivo, "Dominio: %s, Responsavel: %s\n", dominio, nome);  // Escreve no arquivo
-    fclose(arquivo);  // Fecha o arquivo
+
+    fprintf(arquivo, "Dominio: %s\nResponsavel: %s\n", dominio, nome);
+    fprintf(arquivo, "------------------------------\n");
+    fclose(arquivo);
     printf("\nDominio salvo no arquivo com sucesso!\n");
 }
 
-void carregarDominioDeArquivo(char *dominio, char *nome) {
-    FILE *arquivo = fopen("dominios.txt", "r");
-    if (arquivo == NULL) {
-        printf("\nNenhum dominio registrado no arquivo.\n");
-        return;
-    }
+int formatoDominioValido(const char *dominio) {
+    const char *extensoesValidas[] = {".com", ".org", ".net", ".br", ".gov", ".edu", ".io"};
+    int quantidadeExtensoes = sizeof(extensoesValidas) / sizeof(extensoesValidas[0]);
 
-    char linha[200];
+    if (strchr(dominio, '.') == NULL) return 0;
 
-    // Lê a primeira linha do arquivo
-    if (fgets(linha, sizeof(linha), arquivo)) {
-        // Tenta extrair dominio e nome da linha
-        if (sscanf(linha, "Dominio: %99[^,], Responsavel: %99[^\n]", dominio, nome) == 2) {
-            printf("\nDominio carregado do arquivo: %s, Responsavel: %s\n", dominio, nome);
-        } else {
-            printf("\nFormato de linha invalido no arquivo.\n");
+    for (int i = 0; i < quantidadeExtensoes; i++) {
+        size_t lenDominio = strlen(dominio);
+        size_t lenExt = strlen(extensoesValidas[i]);
+        if (lenDominio >= lenExt && strcmp(dominio + lenDominio - lenExt, extensoesValidas[i]) == 0) {
+            return 1;
         }
-    } else {
-        printf("\nNenhum dominio registrado no arquivo.\n");
     }
 
-    fclose(arquivo);
+    return 0;
 }
 
-void apagarDominioNoArquivo(const char *dominio) {
-    FILE *arquivo = fopen("dominios.txt", "r");  // Abre o arquivo no modo "read"
+void apagarTodosDominios(Nodo **lista) {
+    char confirmacao[4];
+    printf("Tem certeza que deseja apagar todos os dominios? (sim/nao): ");
+    fgets(confirmacao, sizeof(confirmacao), stdin);
+    confirmacao[strcspn(confirmacao, "\n")] = 0;
+
+    if (strcmp(confirmacao, "sim") != 0) {
+        printf("Operacao cancelada.\n");
+        return;
+    }
+
+    liberarLista(*lista);
+    *lista = NULL;
+
+    FILE *arquivo = fopen("dominios.txt", "w");
     if (arquivo == NULL) {
-        printf("\nErro ao abrir o arquivo para apagar o dominio.\n");
+        printf("\nErro ao abrir o arquivo para apagar os dominios.\n");
         return;
     }
-
-    // Cria um arquivo temporário para armazenar os dados atualizados
-    FILE *temp = fopen("temp.txt", "w");
-    if (temp == NULL) {
-        printf("\nErro ao criar arquivo temporário.\n");
-        fclose(arquivo);
-        return;
-    }
-
-    char linha[200];
-    int encontrado = 0;
-
-    // Copia as linhas para o arquivo temporário, exceto a linha com o domínio a ser apagado
-    while (fgets(linha, sizeof(linha), arquivo)) {
-        if (strstr(linha, dominio) == NULL) {
-            fputs(linha, temp);
-        } else {
-            encontrado = 1;
-        }
-    }
-
     fclose(arquivo);
-    fclose(temp);
 
-    if (encontrado) {
-        remove("dominios.txt");  // Apaga o arquivo original
-        rename("temp.txt", "dominios.txt");  // Renomeia o arquivo temporário para o nome original
-        printf("\nDominio apagado com sucesso do arquivo!\n");
-    } else {
-        printf("\nDominio nao encontrado no arquivo.\n");
-        remove("temp.txt");  // Remove o arquivo temporário caso não tenha sido necessário
-    }
+    printf("\nTodos os dominios foram apagados com sucesso!\n");
 }
 
 int main() {
     int escolha = -1;
-    char dominio[100] = "";  // Variável para armazenar o domínio
-    char nome[100] = "";     // Variável para armazenar o nome do responsável
+    char dominio[100] = "";
+    char nome[100] = "";
 
-    // Carregar o domínio e o responsável do arquivo
-    carregarDominioDeArquivo(dominio, nome);
+
+    carregarDominiosDoArquivo(&dominios);
 
     while (escolha != 0) {
-        printf("\nMenu\n");
-        printf("1 Registrar um novo dominio\n");
-        printf("2 Exibir o dominio\n");
-        printf("3 Apagar o dominio\n");
-        printf("0 Sair\n");
+        limparTela();
+
+        printf("===================================\n");
+        printf("       REGISTRO DE DOMINIOS\n");
+        printf("===================================\n");
+        printf("1 - Registrar um novo dominio\n");
+        printf("2 - Exibir todos os dominios registrados\n");
+        printf("3 - Verificar se um dominio esta registrado\n");
+        printf("4 - Apagar todos os dominios\n");
+        printf("0 - Sair\n");
+        printf("-----------------------------------\n");
         printf("Escolha uma opcao: ");
-        scanf("%d", &escolha);
-        getchar();  // Limpar o buffer do teclado
+
+        char entrada[10];
+        fgets(entrada, sizeof(entrada), stdin);
+        if (sscanf(entrada, "%d", &escolha) != 1) {
+            printf("\nEntrada invalida! Digite apenas o numero da opcao.\n");
+            escolha = -1;
+            printf("\nPressione Enter para continuar...");
+            getchar();
+            continue;
+        }
 
         if (escolha == 1) {
-            printf("\nInsira o dominio que deseja registrar: ");
+            printf("\nDigite o dominio que deseja registrar: ");
             fgets(dominio, sizeof(dominio), stdin);
-            dominio[strcspn(dominio, "\n")] = 0;  // Remove a quebra de linha
+            dominio[strcspn(dominio, "\n")] = 0;
 
-            printf("Insira o nome do responsavel: ");
-            fgets(nome, sizeof(nome), stdin);
-            nome[strcspn(nome, "\n")] = 0;  // Remove a quebra de linha
-
-            printf("\nDominio %s registrado com sucesso para %s\n", dominio, nome);
-
-            // Salva o domínio no arquivo
-            salvarDominioEmArquivo(dominio, nome);
-        }
-        else if (escolha == 2) {
-            printf("\n");
-            if (dominio[0] == '\0') {
-                printf("Nenhum dominio registrado\n");
+            if (strlen(dominio) == 0) {
+                printf("O dominio nao pode estar vazio!\n");
+            } else if (!formatoDominioValido(dominio)) {
+                printf("Formato de dominio invalido! Use algo como exemplo.com, site.org, etc.\n");
+            } else if (dominioJaExiste(dominios, dominio)) {
+                printf("Este dominio ja esta registrado!\n");
             } else {
-                printf("Dominio registrado: %s\n", dominio);
-                printf("Responsavel: %s\n", nome);
+                printf("Digite o nome do responsavel: ");
+                fgets(nome, sizeof(nome), stdin);
+                nome[strcspn(nome, "\n")] = 0;
+
+                if (strlen(nome) == 0) {
+                    printf("O nome do responsavel e obrigatorio!\n");
+                } else {
+                    printf("\nDominio '%s' registrado com sucesso para '%s'!\n", dominio, nome);
+                    registrarDominio(&dominios, dominio, nome);
+                    salvarDominioNoArquivo(dominio, nome);
+                }
             }
-        }
-        else if (escolha == 3) {
-            printf("\n");
-            if (dominio[0] == '\0') {
-                printf("Nenhum dominio para apagar\n");
+        } else if (escolha == 2) {
+            exibirTodosDominios(dominios);
+        } else if (escolha == 3) {
+            printf("\nDigite o dominio que deseja verificar: ");
+            fgets(dominio, sizeof(dominio), stdin);
+            dominio[strcspn(dominio, "\n")] = 0;
+
+            if (dominioJaExiste(dominios, dominio)) {
+                printf("O dominio '%s' esta registrado.\n", dominio);
             } else {
-                apagarDominioNoArquivo(dominio);  // Apaga o domínio do arquivo
-                dominio[0] = '\0';  // Limpa o domínio da memória
-                nome[0] = '\0';     // Limpa o nome da memória
-                printf("Dominio apagado com sucesso\n");
+                printf("O dominio '%s' NAO esta registrado.\n", dominio);
             }
+        } else if (escolha == 4) {
+            apagarTodosDominios(&dominios);
+        } else if (escolha == 0) {
+            printf("\nEstamos te esperando novamente\n");
+        } else {
+            printf("\nOpcao invalida. Tente novamente.\n");
         }
-        else if (escolha == 0) {
-            printf("\nEncerrando o programa\n");
-        }
-        else {
-            printf("\nOpcao invalida\n");
-        }
+
+        printf("\nPressione Enter para continuar...");
+        getchar();
     }
+
+
+    liberarLista(dominios);
 
     return 0;
 }
