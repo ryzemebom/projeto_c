@@ -44,14 +44,14 @@ int dominioJaExiste(No *lista, const char *dominio) {
 void exibirTodosDominios(No *lista) {
     No *noAtual = lista;
     if (noAtual == NULL) {
-        printf("\nNenhum domínio registrado.\n");
+        printf("\nNenhum dominio registrado.\n");
         return;
     }
 
-    printf("\nDomínios registrados:\n");
+    printf("\nDominios registrados:\n");
     printf("-------------------------------\n");
     while (noAtual != NULL) {
-        printf("Dominio: %s\nResponsável: %s\n", noAtual->dominio, noAtual->responsavel);
+        printf("Dominio: %s\nResponsavel: %s\n", noAtual->dominio, noAtual->responsavel);
         printf("-------------------------------\n");
         noAtual = noAtual->next;
     }
@@ -96,7 +96,7 @@ void salvarDominioNoArquivo(const char *dominio, const char *nome) {
         return;
     }
 
-    fprintf(arquivo, "Dominio: %s\nResponsavel: %s\n", dominio, nome);
+    fprintf(arquivo, "Dominio: %s\n responsavel: %s\n", dominio, nome);
     fprintf(arquivo, "------------------------------\n");
     fclose(arquivo);
     printf("\nDominio salvo no arquivo com sucesso!\n");
