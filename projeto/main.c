@@ -98,14 +98,14 @@ void salvarDominioNoArquivo(const char *dominio, const char *nome) {
         return;
     }
 
-    fprintf(arquivo, "Dominio: %s\n responsavel: %s\n", dominio, nome);
+    fprintf(arquivo, "Dominio: %s\nResponsavel: %s\n", dominio, nome);
     fprintf(arquivo, "------------------------------\n");
     fclose(arquivo);
     printf("\nDominio salvo no arquivo com sucesso!\n");
 }
 
 int formatoDominioValido(const char *dominio) {
-    const char *extensoesValidas[] = {".com", ".org", ".net", ".br", ".gov", ".edu", ".io"};
+    const char *extensoesValidas[] = {".com", ".org", ".net", ".br", ".gov", ".edu", ".io", ".app",".dev","bet"};
     int quantidadeExtensoes = sizeof(extensoesValidas) / sizeof(extensoesValidas[0]);
 
     int len = strlen(dominio);
@@ -320,7 +320,6 @@ int main() {
 
             if (dominioJaExiste(listaDominios, dominioRegistro)) {
                 printf("O dominio '%s' esta registrado.\n", dominioRegistro);
-                printf("O responsavel e: ",responsavelDominio);
             } else {
                 printf("O dominio '%s' NAO esta registrado.\n", dominioRegistro);
             }
