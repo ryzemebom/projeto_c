@@ -27,6 +27,11 @@ Este projeto é um sistema simples para registrar e gerenciar domínios e seus r
 O código é dividido em funções que tratam de cada operação específica, como registrar um domínio, exibir a lista de domínios, verificar se um domínio já existe, e apagar domínios. A estrutura `No` é usada para armazenar os domínios e seus respectivos responsáveis.
 
 * **Função RegistrarDominio**: Registra um novo domínio na lista.
+
+![image](https://github.com/user-attachments/assets/84eae39f-3049-4fa1-bc68-5d57193511d4)
+
+
+
 * **Função DominioJaExiste**: Verifica se o domínio já está registrado.
 * **Função ExibirTodosDominios**: Exibe todos os domínios registrados.
 * **Função LimparTela**: Limpa a tela para uma melhor visualização da interface.
