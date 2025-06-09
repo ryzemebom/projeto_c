@@ -8,7 +8,7 @@ Este projeto é um sistema simples para registrar e gerenciar domínios e seus r
    Permite registrar um novo domínio com o nome do responsável. O sistema valida se o formato do domínio está correto e se o domínio já está registrado.
 
 
-![image](https://github.com/user-attachments/ass84eae39f-3049-4fa1-bc68-5d57193511d4)
+![image](https://github.com/user-attachments/assets/2d438e70-086e-4ebe-ad61-60ecb17c704a)
 
 
 2. **Exibir Todos os Domínios Registrados**
