@@ -7,33 +7,47 @@ Este projeto é um sistema simples para registrar e gerenciar domínios e seus r
 1. **Registrar um Novo Domínio**
    Permite registrar um novo domínio com o nome do responsável. O sistema valida se o formato do domínio está correto e se o domínio já está registrado.
 
+
+![image](https://github.com/user-attachments/ass84eae39f-3049-4fa1-bc68-5d57193511d4)
+
+
 2. **Exibir Todos os Domínios Registrados**
    Exibe todos os domínios e seus responsáveis armazenados.
+
+
+![image](https://github.com/user-attachments/assets/2a534c12-beb9-4fd9-b0b1-17cce9b38cfb)
+
 
 3. **Verificar se um Domínio Está Registrado**
    Permite verificar se um domínio específico já está registrado.
 
+![image](https://github.com/user-attachments/assets/aa58fd5b-050c-4366-92ec-ee32597d4028)
+
+
+
 4. **Apagar um Domínio Específico**
    Permite apagar um domínio da lista de domínios registrados.
+
+![image](https://github.com/user-attachments/assets/00b7dc95-8e89-48a2-82f2-9d9da21ec379)
+
 
 5. **Apagar Todos os Domínios**
    Apaga todos os domínios registrados, tanto na lista quanto no arquivo de armazenamento.
 
+![image](https://github.com/user-attachments/assets/f18e12a5-9aa7-4653-b6cf-5e29832c78fd)
+
+
+
 6. **Armazenamento em Arquivo**
    Todos os dados de domínios registrados são salvos em um arquivo de texto (`dominios.txt`), que é carregado ao iniciar o programa.
+
+![image](https://github.com/user-attachments/assets/61cd697b-3c0d-4429-bdcd-08654b96e5ed)
+
+
 
 ## Estrutura do Código
 
 O código é dividido em funções que tratam de cada operação específica, como registrar um domínio, exibir a lista de domínios, verificar se um domínio já existe, e apagar domínios. A estrutura `No` é usada para armazenar os domínios e seus respectivos responsáveis.
 
 * **Função RegistrarDominio**: Registra um novo domínio na lista.
-
-![image](https://github.com/user-attachments/assets/84eae39f-3049-4fa1-bc68-5d57193511d4)
-
-
-
-* **Função DominioJaExiste**: Verifica se o domínio já está registrado.
-* **Função ExibirTodosDominios**: Exibe todos os domínios registrados.
-* **Função LimparTela**: Limpa a tela para uma melhor visualização da interface.
-* **Função SalvarDominioNoArquivo**: Salva os domínios registrados no arquivo `dominios.txt`.
-* **Função CarregarDominiosDoArquivo**: Carrega os domínios registrados a partir do arquivo `dominios.txt`.
+ets/
