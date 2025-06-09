@@ -42,12 +42,3 @@ Este projeto é um sistema simples para registrar e gerenciar domínios e seus r
    Todos os dados de domínios registrados são salvos em um arquivo de texto (`dominios.txt`), que é carregado ao iniciar o programa.
 
 ![image](https://github.com/user-attachments/assets/61cd697b-3c0d-4429-bdcd-08654b96e5ed)
-
-
-
-## Estrutura do Código
-
-O código é dividido em funções que tratam de cada operação específica, como registrar um domínio, exibir a lista de domínios, verificar se um domínio já existe, e apagar domínios. A estrutura `No` é usada para armazenar os domínios e seus respectivos responsáveis.
-
-* **Função RegistrarDominio**: Registra um novo domínio na lista.
-ets/
