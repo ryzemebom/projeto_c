@@ -18,6 +18,13 @@ typedef struct No {
 
 No *listaDominios = NULL;
 
+
+void limparBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+
 void registrarDominio(No **lista, const char *dominio, const char *responsavel) {
     No *novoNo = (No *)malloc(sizeof(No));
     if (novoNo == NULL) {
@@ -40,6 +47,110 @@ int dominioJaExiste(No *lista, const char *dominio) {
     }
     return 0;
 }
+
+void editarDominio(No **lista) {
+    if (*lista == NULL) {
+        printf("\nNenhum dominio registrado para editar.\n");
+        return;
+    }
+
+    printf("\nDominios registrados:\n");
+    printf("-------------------------------\n");
+
+    No *noAtual = *lista;
+    int index = 1;
+    while (noAtual != NULL) {
+        printf("%d - Dominio: %s | Responsavel: %s\n", index, noAtual->dominio, noAtual->responsavel);
+        noAtual = noAtual->next;
+        index++;
+    }
+
+    printf("\nDigite o numero do dominio que deseja editar (0 para cancelar): ");
+
+    char entrada[10];
+    int escolha = 0;
+    fgets(entrada, sizeof(entrada), stdin);
+    sscanf(entrada, "%d", &escolha);
+
+    if (escolha == 0) {
+        printf("Edição cancelada.\n");
+        return;
+    }
+
+    if (escolha >= index || escolha < 1) {
+        printf("Número inválido, tente novamente.\n");
+        editarDominio(lista);
+        return;
+    }
+
+    // Encontrar o domínio selecionado
+    No *anterior = NULL;
+    noAtual = *lista;
+    int i = 1;
+    while (noAtual != NULL && i < escolha) {
+        anterior = noAtual;
+        noAtual = noAtual->next;
+        i++;
+    }
+
+    if (noAtual == NULL) {
+        printf("Dominio nao encontrado.\n");
+        return;
+    }
+
+    char novoDominio[100];
+    char novoResponsavel[100];
+
+    printf("Dominio atual: %s\n", noAtual->dominio);
+    printf("Digite o novo dominio (deixe vazio para manter o atual): ");
+    fgets(novoDominio, sizeof(novoDominio), stdin);
+    novoDominio[strcspn(novoDominio, "\n")] = 0;
+
+    if (strlen(novoDominio) > 0) {
+        // Validar formato do domínio
+        if (!formatoDominioValido(novoDominio)) {
+            printf("Formato de dominio invalido!\n");
+            return;
+        }
+        // Verificar se já existe outro domínio igual (ignorando o próprio)
+        if (dominioJaExiste(*lista, novoDominio) && strcmp(noAtual->dominio, novoDominio) != 0) {
+            printf("Este dominio ja esta registrado!\n");
+            return;
+        }
+    }
+
+    printf("Responsavel atual: %s\n", noAtual->responsavel);
+    printf("Digite o novo responsavel (deixe vazio para manter o atual): ");
+    fgets(novoResponsavel, sizeof(novoResponsavel), stdin);
+    novoResponsavel[strcspn(novoResponsavel, "\n")] = 0;
+
+    // Atualizar campos se o usuário digitou algo
+    if (strlen(novoDominio) > 0) {
+        strcpy(noAtual->dominio, novoDominio);
+    }
+    if (strlen(novoResponsavel) > 0) {
+        strcpy(noAtual->responsavel, novoResponsavel);
+    }
+
+    // Atualizar arquivo
+    FILE *arquivo = fopen("dominios.txt", "w");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo para atualizar.\n");
+        return;
+    }
+
+    noAtual = *lista;
+    while (noAtual != NULL) {
+        fprintf(arquivo, "Dominio: %s\nResponsavel: %s\n", noAtual->dominio, noAtual->responsavel);
+        fprintf(arquivo, "------------------------------\n");
+        noAtual = noAtual->next;
+    }
+
+    fclose(arquivo);
+
+    printf("\nDominio editado com sucesso!\n");
+}
+
 
 void exibirTodosDominios(No *lista) {
     No *noAtual = lista;
@@ -273,6 +384,7 @@ int main() {
         printf("3 - Verificar se um dominio esta registrado\n");
         printf("4 - Apagar um dominio especifico\n");
         printf("5 - Apagar todos os dominios\n");
+        printf("6 - Editar um dominio\n");
         printf("0 - Sair\n");
         printf("-----------------------------------\n");
         printf("Escolha uma opcao: ");
@@ -328,6 +440,10 @@ int main() {
 
                  } else if (escolha == 5) {
             apagarTodosDominios(&listaDominios);
+
+                 } else if (escolha == 6) {
+            editarDominio(&listaDominios);
+
         } else if (escolha == 0) {
             printf("\nEstamos te esperando novamente\n");
 
